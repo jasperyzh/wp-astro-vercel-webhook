@@ -1,0 +1,93 @@
+---
+// src/components/WordPressPosts.astro
+export interface Post {
+  id: number;
+  title: {
+    rendered: string;
+  };
+  excerpt: {
+    rendered: string; // This is HTML
+  };
+  link: string;
+}
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="wordpress-posts">
+  <h2>Recent Posts from WordPress</h2>
+  {posts && posts.length > 0 ? (
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <h3><a href={post.link} target="_blank" rel="noopener noreferrer">{post.title.rendered}</a></h3>
+          <Fragment set:html={post.excerpt.rendered} />
+          <a href={post.link} target="_blank" rel="noopener noreferrer">Read more...</a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No posts found.</p>
+  )}
+</div>
+
+<style>
+  .wordpress-posts ul {
+    list-style: none;
+    padding: 0;
+    display: grid; /* Optional: for a grid layout of cards */
+    gap: 1.5em; /* Optional: for spacing in grid layout */
+    /* For a single column layout, remove display:grid and gap */
+  }
+  .wordpress-posts li {
+    margin-bottom: 1.5em; /* Keep if not using grid layout */
+    padding: 1.5em;
+    border: 1px solid #e0e0e0; /* Slightly softer border */
+    border-radius: 8px; /* More pronounced rounding */
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow for card effect */
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+  .wordpress-posts li:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .wordpress-posts h2 {
+    text-align: center;
+    margin-bottom: 1.5em;
+    color: #222;
+  }
+  .wordpress-posts h3 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    font-size: 1.25em;
+  }
+  .wordpress-posts h3 a {
+    text-decoration: none;
+    color: #0073aa; /* WordPress blue, or choose your own */
+  }
+  .wordpress-posts h3 a:hover {
+    text-decoration: underline;
+  }
+  .wordpress-posts .post-excerpt p {
+    margin-top: 0;
+    margin-bottom: 1em;
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #555;
+  }
+  .wordpress-posts a[href*="read more"] {
+    display: inline-block;
+    font-size: 0.9em;
+    color: #0073aa;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .wordpress-posts a[href*="read more"]:hover {
+    text-decoration: underline;
+  }
+</style> 

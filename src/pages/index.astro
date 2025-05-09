@@ -1,6 +1,33 @@
 ---
 import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import WordPressPosts, { type Post } from '../components/WordPressPosts.astro';
+
+// Determine API URL based on environment
+const WORDPRESS_API_URL_BASE = import.meta.env.DEV 
+  ? 'http://localhost:8000'
+  : 'https://wp.jasperyong.com';
+
+const WORDPRESS_POSTS_URL = `${WORDPRESS_API_URL_BASE}/wp-json/wp/v2/posts?_embed&per_page=5`; // Fetch 5 posts
+
+let posts: Post[] = [];
+
+try {
+  const response = await fetch(WORDPRESS_POSTS_URL);
+  if (response.ok) {
+    posts = await response.json();
+  } else {
+    console.error(`Failed to fetch posts: ${response.status} ${response.statusText}`);
+    const errorBody = await response.text();
+    console.error('Error body:', errorBody);
+  }
+} catch (error) {
+  console.error('Error fetching WordPress posts:', error);
+  // In dev, if localhost:8000 is not running, this will catch the error.
+  if (import.meta.env.DEV) {
+    console.info("Make sure your local WordPress (localhost:8000) is running if you expect to see posts during development.");
+  }
+}
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
@@ -8,4 +35,14 @@ import Layout from '../layouts/Layout.astro';
 
 <Layout>
 	<Welcome />
+	<div class="container">
+		<WordPressPosts posts={posts} />
+	</div>
+	<style>
+		.container {
+			max-width: 768px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+	</style>
 </Layout>
